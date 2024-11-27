@@ -232,18 +232,28 @@ def delete_student(register_number):
 def commit_student():
     data = request.json
     try:
+        # Check if all fields are present in the request
+        required_fields = ["register_number", "name", "department", "cgpa", "attendance"]
+        missing_fields = [field for field in required_fields if field not in data or not data[field]]
+        if missing_fields:
+            return jsonify({"error": f"All fields are mandatory. Missing: {', '.join(missing_fields)}"}), 400
+
         # Establishing a database connection
-        conn = get_db_connection()  # Adjust this as per your database connection setup
+        conn = get_db_connection()  # Adjust this to your connection logic
         cursor = conn.cursor()
 
+        # Check if the register number already exists
+        check_query = "SELECT COUNT(*) FROM students WHERE register_number = ?"
+        cursor.execute(check_query, data["register_number"])
+        if cursor.fetchone()[0] > 0:
+            return jsonify({"error": "Register number already exists in the students table!"}), 400
+
         # SQL query to insert data into the 'students' table
-        query = """
+        insert_query = """
             INSERT INTO students (register_number, name, department, cgpa, attendance)
             VALUES (?, ?, ?, ?, ?)
         """
-
-        # Executing the query with the provided data
-        cursor.execute(query, (
+        cursor.execute(insert_query, (
             data["register_number"], data["name"], data["department"],
             data["cgpa"], data["attendance"]
         ))
@@ -252,16 +262,9 @@ def commit_student():
         conn.commit()
         return jsonify({"message": "Student record inserted successfully into students table!"}), 201
 
-    except pyodbc.IntegrityError:  # Handle duplicate primary key error (e.g., if the register_number already exists)
-        return jsonify({"error": "Register number already exists in the students table!"}), 400
-
-    except pyodbc.Error as e:  # Handle any other database-related errors
+    except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
 
-    finally:
-        # Close the cursor and connection to the database
-        cursor.close()
-        conn.close()
 
 @app.route("/get_students", methods=["GET"])
 def get_students():

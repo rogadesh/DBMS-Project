@@ -89,25 +89,51 @@
     }
 
     .btn-group {
-      margin-top: 15px;
-      display: flex;
-      justify-content: space-between;
-    }
+    margin-top: 15px; /* Space between the button group and the fields above */
+    display: flex; /* Arrange buttons horizontally */
+    gap: 27px; /* Space between buttons */
+    justify-content: flex-start; /* Adjust alignment (use 'space-between' or 'flex-start' for left alignment) */
+    flex-wrap: wrap; /* Allow buttons to wrap onto a new line if needed */
+  }
+
+  .btn-group button {
+    padding: 10px 25px; /* Padding for uniform button size */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap; /* Prevent button text from wrapping */
+  }
+
+  .btn-group button:hover {
+    background-color: #0056b3;
+  }
 
     button {
-      width: calc(14% - 5px);
-      padding: 8px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+    width: auto; /* Allow the button width to adjust dynamically */
+    padding: 10px 15px; /* Add padding for a better appearance */
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap; /* Prevent the text from wrapping to a new line */
+    text-align: center; /* Ensure the text is centered */
+  }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+  button:hover {
+    background-color: #0056b3;
+  }
 
+  /* Specific styles for aligning and spacing the buttons */
+  .btn-container {
+    display: flex; /* Arrange buttons horizontally */
+    gap: 15px; /* Add space between the buttons */
+    justify-content: flex-start; /* Align buttons to the left */
+    margin-bottom: 20px; /* Space between buttons and the table */
+  }
     /* Close button CSS */
     .modal-header button {
       position: absolute;
@@ -189,13 +215,18 @@
   margin-right: 5px; /* Space between radio button and label text */
 }
 
+#search-button {
+  margin-left: 25px; /* Pushes the button to the right */
+  /* margin-top: 10px;  Pushes the button downward */
+}
+
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Student Performance Tracker</h1>
     <button onclick="openModal()">Add Student</button>
-    <button onclick="openSearchModal()">Search Student</button>
+    <button id="search-button" onclick="openSearchModal()">Search Student</button>
 
 <div class="modal" id="search-modal">
   <div class="modal-content">
@@ -507,29 +538,35 @@ function commitChanges() {
     attendance: parseFloat(document.getElementById("attendance").value.trim())
   };
 
+  // Validate all fields are filled
+  if (!studentData.register_number || !studentData.name || !studentData.department || !studentData.cgpa || !studentData.attendance) {
+    alert("All fields are mandatory. Please fill in all fields.");
+    return; // Stop execution
+  }
+
   // Validate the register number (must be 10 digits)
   const registerNumberPattern = /^\d{10}$/;
   if (!registerNumberPattern.test(studentData.register_number)) {
     alert("Register number must be exactly 10 digits.");
-    return; // Stop further execution if invalid
+    return; // Stop execution
   }
 
   // Validate the CGPA (must be between 0 and 10)
   if (studentData.cgpa < 0 || studentData.cgpa > 10) {
     alert("CGPA must be between 0 and 10.");
-    return; // Stop further execution if invalid
+    return; // Stop execution
   }
 
   // Validate attendance (must be less than or equal to 100)
   if (studentData.attendance > 100) {
     alert("Attendance must be less than or equal to 100.");
-    return; // Stop further execution if invalid
+    return; // Stop execution
   }
 
   // Validate that at least one department is selected
   if (!studentData.department) {
     alert("Please select a department.");
-    return; // Stop further execution if no department is selected
+    return; // Stop execution
   }
 
   // Send a POST request to the backend to commit the changes
@@ -542,10 +579,10 @@ function commitChanges() {
   })
     .then(response => {
       if (response.ok) {
-        return response.json(); // If successful, parse JSON
+        return response.json(); // Success response
       } else {
         return response.json().then(err => {
-          throw new Error(err.error || "Unknown error occurred"); // Handle the error more generically
+          throw new Error(err.error || "Unknown error occurred"); // Handle errors
         });
       }
     })
