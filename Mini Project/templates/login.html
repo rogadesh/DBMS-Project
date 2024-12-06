@@ -57,6 +57,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      margin-top: 10px; /* Add margin to space the buttons */
     }
 
     button:hover {
@@ -97,10 +98,14 @@
       </div>
       <button type="submit">Login</button>
     </form>
+
     {% if error %}
     <div class="error">{{ error }}</div>
     {% endif %}
+
+    <button class="submit" onclick="window.location.href='/signup'">New User? Sign Up here</button>
     <button class="link-btn" onclick="window.location.href='/change_password'">Forgot Password?</button>
+    
   </div>
 </body>
 </html>

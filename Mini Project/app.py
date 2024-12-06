@@ -21,7 +21,7 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    return redirect(url_for('signup'))  # Redirects to the signup page on startup
+    return redirect(url_for('login'))  # Redirects to the signup page on startup
 
 @app.route('/welcome')
 def welcome():

@@ -320,17 +320,17 @@
   </div>
 
   <script>
-    let students = [];
-    let currentIndex = null
-    let editingIndex = null;
-    let insertEnabled = false;
+  let students = [];
+let currentIndex = null;
+let editingIndex = null;
+let insertEnabled = true;
 
-    document.addEventListener("DOMContentLoaded", fetchStudents);
+document.addEventListener("DOMContentLoaded", fetchStudents);
 
-    function toggleInsert() {
+function toggleInsert() {
   insertEnabled = !insertEnabled; // Toggle the flag
 
-  // Enable or disable all input fields
+  // Enable or disable all input fields based on the toggle state
   document.getElementById('register_number').disabled = !insertEnabled;
   document.getElementById('name').disabled = !insertEnabled;
   document.getElementById('cgpa').disabled = !insertEnabled;
@@ -342,13 +342,15 @@
     radio.disabled = !insertEnabled;
   });
 
-  // Show alert based on the state
+  // Update button text and show an alert
+  const insertButton = document.querySelector('button[onclick="toggleInsert()"]');
   if (insertEnabled) {
-    alert("Insertion can now be done!");
+    alert("Insertion is enabled. You can now fill in the fields.");
   } else {
-    alert("Insertion of data cannot be done now!");
+    alert("Insertion is disabled. Fields are now locked.");
   }
 }
+
 
     function getSelectedDepartment() {
     const departmentRadioButtons = document.getElementsByName('department');
@@ -460,16 +462,17 @@ async function fetchStudentDetails() {
     }
 
     function clearModalInputs() {
-  document.getElementById('register_number').value = '';
+  // Leave the 'register_number' field untouched
   document.getElementById('name').value = '';
   document.getElementById('cgpa').value = '';
   document.getElementById('attendance').value = '';
 
-  // Uncheck all checkboxes
-  document.querySelectorAll("input[name='department']").forEach(checkbox => {
-    checkbox.checked = false;
+  // Uncheck all department radio buttons
+  document.querySelectorAll("input[name='department']").forEach(radio => {
+    radio.checked = false;
   });
 }
+
 
 function saveChanges() {
   const student = getStudentData();  // Get data from the form
