@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buffer Records - Student Performance Tracker</title>
+  <style>
+    /* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Container Styling */
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 1000px;
+  text-align: center;
+}
+
+/* Title Styling */
+h1 {
+  font-size: 2.5rem;
+  margin-right: 40px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+/* Table Header Styling */
+thead {
+  background-color: #007BFF;
+  color: white;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  font-weight: bold;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Button Styling */
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 50px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsiveness for Smaller Screens */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  table th, table td {
+    padding: 8px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 15px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Buffer Records</h1>
+    <div class="modal-body">
+      <table id="bufferTable" border="1">
+        <thead>
+          <tr>
+            <th>Register Number</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>CGPA</th>
+            <th>Attendance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic content will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Main Page Button -->
+    <button onclick="window.location.href='/student_page'">Main Page</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchBufferRecords(); // Fetch records when page loads
+    });
+
+    function fetchBufferRecords() {
+        fetch('http://localhost:5000/get_buffer_records')  // Ensure correct URL
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    populateBufferTable(data);  // Function to populate table with data
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function populateBufferTable(data) {
+        const tableBody = document.querySelector('#bufferTable tbody');
+        tableBody.innerHTML = ''; // Clear any existing rows
+
+        data.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.register_number}</td>
+                <td>${record.name}</td>
+                <td>${record.department}</td>
+                <td>${record.cgpa}</td>
+                <td>${record.attendance}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+  </script>
+</body>
+</html>

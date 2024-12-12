@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Student - Student Performance Tracker</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Container Styling */
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 1000px;
+      text-align: center;
+      overflow: hidden; /* Ensures content inside the container is clipped properly */
+    }
+
+    /* Title Styling */
+    h1 {
+      font-size: 2.5rem;
+      margin-right: 50px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* Form Styling */
+    .form-group {
+      margin-bottom: 20px;
+      margin-left: 190px;
+      text-align: left;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .form-group select {
+      padding: 10px;
+      font-size: 1rem;
+      width: 200px;
+      border-radius: 4px;
+    }
+
+    .form-group button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .form-group button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    /* Table Header Styling */
+    thead {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+      background-color: #e9ecef;
+    }
+
+    /* Button Styling */
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 4px;
+      margin-right: 65px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Responsiveness for Smaller Screens */
+    @media (max-width: 768px) {
+      .container {
+        width: 90%;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      table th, table td {
+        padding: 8px;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 15px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Search Student</h1>
+
+    <!-- Search Form -->
+    <div class="form-group">
+      <label for="registerDropdown">Select Register Number:</label>
+      <select id="registerDropdown">
+        <option value="" disabled selected>Select Register Number</option>
+        <!-- Options will be populated dynamically -->
+      </select>
+      <button onclick="fetchStudentDetails()">Fetch Details</button>
+    </div>
+
+    <!-- Student Details Table -->
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Register Number</th>
+          <th>Name</th>
+          <th>Department</th>
+          <th>CGPA</th>
+          <th>Attendance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Student records will be inserted here -->
+      </tbody>
+    </table>
+
+    <!-- Main Page Button -->
+    <button onclick="window.location.href='/student_page'">Main Page</button>
+  </div>
+
+  <script>
+    // Fetch Register Numbers on Page Load
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchRegisterNumbers(); // Fetch register numbers when page loads
+    });
+
+    // Fetch Register Numbers for the Dropdown
+    function fetchRegisterNumbers() {
+      fetch('http://localhost:5000/get_register_numbers')  // Flask route to fetch register numbers
+        .then(response => response.json())
+        .then(data => {
+          const dropdown = document.getElementById("registerDropdown");
+          data.forEach(register => {
+            const option = document.createElement("option");
+            option.value = register;
+            option.textContent = register;
+            dropdown.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error fetching register numbers:', error));
+    }
+
+    // Fetch Student Details based on Selected Register Number
+    function fetchStudentDetails() {
+      const registerNumber = document.getElementById("registerDropdown").value;
+      if (registerNumber) {
+        fetch(`http://localhost:5000/fetch_student_details_by_register_number/${registerNumber}`)  // Flask route to fetch student details
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.querySelector('#studentTable tbody');
+            tableBody.innerHTML = ''; // Clear previous records
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${data.register_number}</td>
+              <td>${data.name}</td>
+              <td>${data.department}</td>
+              <td>${data.cgpa}</td>
+              <td>${data.attendance}</td>
+            `;
+            tableBody.appendChild(row);
+          })
+          .catch(error => console.error('Error fetching student details:', error));
+      } else {
+        alert("Please select a register number.");
+      }
+    }
+  </script>
+
+</body>
+</html>

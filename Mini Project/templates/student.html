@@ -4,10 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Performance Tracker</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
+    
+    html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure full coverage */
+  overflow: hidden; /* Prevent background scrolling */
+}
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
       margin: 0;
       padding: 0;
     }
@@ -18,7 +26,7 @@
       background: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     h1 {
@@ -42,30 +50,96 @@
       background-color: #f2f2f2;
     }
 
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-    }
+ /* Modal Overlay */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scrolling if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
 
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      width: 800px; /* Increased width */
-    }
+/* Modal Content */
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the modal */
+  background-color: #fff;
+  padding: 20px;
+  width: 500px; /* Adjust width as needed */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Modal Header */
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  color: #333;
+  text-align: center;
+}
+
+/* Form Group Styling */
+.modal-content label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 10px 0 5px;
+  color: #555;
+  text-align: left;
+}
+
+.modal-content select, 
+.modal-content input {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  text-align: left;
+}
+
+/* Buttons Container */
+.modal-content .button-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Buttons Styling */
+.modal-content button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #0056b3;
+}
+
+.modal-open {
+  overflow: hidden;
+}
 
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
     }
 
     .modal-header h2 {
@@ -87,17 +161,40 @@
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+    .btn-group1 {
+    margin-left: 160px;
+    margin-top: 15px; /* Space between the button group and the fields above */
+    display: flex; /* Arrange buttons horizontally */
+    gap: 15px; /* Space between buttons */
+    justify-content: flex-start; /* Adjust alignment (use 'space-between' or 'flex-start' for left alignment) */
+    flex-wrap: wrap; /* Allow buttons to wrap onto a new line if needed */
+  }
+
+  .btn-group1 button {
+    padding: 10px 22.5px; /* Padding for uniform button size */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap; /* Prevent button text from wrapping */
+  }
+
+  .btn-group1 button:hover {
+    background-color: #0056b3;
+  }
 
     .btn-group {
     margin-top: 15px; /* Space between the button group and the fields above */
     display: flex; /* Arrange buttons horizontally */
-    gap: 27px; /* Space between buttons */
+    gap: 15px; /* Space between buttons */
     justify-content: flex-start; /* Adjust alignment (use 'space-between' or 'flex-start' for left alignment) */
     flex-wrap: wrap; /* Allow buttons to wrap onto a new line if needed */
   }
 
   .btn-group button {
-    padding: 10px 25px; /* Padding for uniform button size */
+    padding: 10px 22.5px; /* Padding for uniform button size */
     background-color: #007bff;
     color: white;
     border: none;
@@ -219,105 +316,158 @@
   margin-left: 25px; /* Pushes the button to the right */
   /* margin-top: 10px;  Pushes the button downward */
 }
+/* Styling for Confirm button */
+#confirmButton {
+  margin-left: 10px;  /* Space to the right */
+  padding: 10px 20px;
+  background-color: #007bff;  /* Green background */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
 
+#confirmButton:hover {
+  background-color: #0056b3;  /* Slightly darker green on hover */
+}
+
+/* Styling for Update button */
+#updateButton {
+  margin-left: 10px;  /* Space to the left */
+  padding: 10px 20px;
+  background-color: #008CBA;  /* Blue background */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.dropdown-container,
+.button-container {
+  display: inline-block;
+  margin-right: 15px;
+}
+
+/* Style for the dropdown */
+#registerDropdown {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 200px; /* Set width for consistency */
+}
+
+/* Style for the button */
+#fetchStudentDetailsBtn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#fetchStudentDetailsBtn:hover {
+  background-color: #45a049;
+}
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Student Performance Tracker</h1>
-    <button onclick="openModal()">Add Student</button>
-    <button id="search-button" onclick="openSearchModal()">Search Student</button>
 
-<div class="modal" id="search-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 id="search-modal-title">Search Student</h2>
-      <button onclick="closeSearchModal()">✖</button>
-    </div>
-    <form id="search-student-form">
+    <!-- Student Entry Form -->
+    <form id="student-form">
       <div class="form-group">
-        <label for="search_register_number">Register Number</label>
-        <input type="text" id="search_register_number" placeholder="Enter Register Number" oninput="searchStudents()" />
+        <label for="register_number">Register Number</label>
+        <input type="text" id="register_number" required placeholder="Enter the Register Number" oninput="checkRegisterNumberLength()" />
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Register Number</th>
-            <th>Name</th>
-            <th>Department</th>
-            <th>CGPA</th>
-            <th>Attendance</th>
-          </tr>
-        </thead>
-        <tbody id="search-results"></tbody>
-      </table>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" required placeholder="Enter the Name of the Student"/>
+      </div>
+      <div class="form-group">
+        <label for="department">Department</label>
+        <div id="department" class="radio-group">
+          <label><input type="radio" name="department" value="IT" /> IT</label>
+          <label><input type="radio" name="department" value="CSE" /> CSE</label>
+          <label><input type="radio" name="department" value="ECE" /> ECE</label>
+          <label><input type="radio" name="department" value="EEE" /> EEE</label>
+          <label><input type="radio" name="department" value="EIE" /> EIE</label>
+          <label><input type="radio" name="department" value="CIVIL" /> CIVIL</label>
+          <label><input type="radio" name="department" value="MECH" /> MECH</label>
+          <label><input type="radio" name="department" value="MT" /> MT</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cgpa">CGPA</label>
+        <input type="number" id="cgpa" step="0.1" required placeholder="Enter the CGPA"/>
+      </div>
+      <div class="form-group">
+        <label for="attendance">Attendance (%)</label>
+        <input type="number" id="attendance" required placeholder="Enter the Percentage of Attendance"/>
+      </div>
     </form>
+
+    <!-- Search Student Button -->
+     <div class="btn-group">
+    <button type="button" onclick="goToPrevious()">Previous</button>
+    <button type="button" onclick="toggleInsert()">Insert</button>
+    <button type="button" onclick="openUpdateModal()">Update</button>
+    <button type="button" onclick="clearModalInputs()">Clear</button>
+    <button type="button" onclick="saveChanges()">Save</button>
+    <button type="button" onclick="deleteStudent()">Delete</button>
+    <button type="button" onclick="commitChanges()">Commit</button>
+    <button type="button" onclick="goToNext()">Next</button>    
+    </div>
+    <div class="btn-group1"> 
+      <button onclick="window.location.href='/buffer_records'">Buffer Records</button>
+      <button onclick="window.location.href='/search_student'">Search Student</button>
+      <button onclick="window.location.href='/database_records'">Database Records</button>
+    </div>
+
+<!-- Update Modal -->
+<div id="update-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h2>Update Student Information</h2>
+    <label for="update-field">Field to Update</label>
+    <select id="update-field" onchange="updateFieldSelection()">
+      <option value="">Select Field</option>
+      <option value="name">Name</option>
+      <option value="department">Department</option>
+      <option value="cgpa">CGPA</option>
+      <option value="attendance">Attendance</option>
+    </select>
+
+    <!-- Department Dropdown (Only visible when 'Department' is selected) -->
+    <div id="department-dropdown" style="display: none;">
+      <label for="department-value">Select Department</label>
+      <select id="department-value">
+        <option value="IT">IT</option>
+        <option value="CSE">CSE</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="EIE">EIE</option>
+        <option value="CIVIL">CIVIL</option>
+        <option value="MECH">MECH</option>
+        <option value="MT">MT</option>
+      </select>
+    </div>
+
+    <!-- Generic Text Input for name, cgpa, or attendance -->
+    <div id="generic-input" style="display: none;">
+      <label for="new-value">New Value</label>
+      <input type="text" id="new-value" required placeholder="Enter New Value"/>
+    </div>
+
+    <button type="button" onclick="submitUpdate()">Submit Update</button>
+    <button type="button" onclick="closeUpdateModal()">Cancel</button>
   </div>
 </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Register Number</th>
-          <th>Name</th>
-          <th>Department</th>
-          <th>CGPA</th>
-          <th>Attendance</th>
-          <th>Options</th>
-        </tr>
-      </thead>
-      <tbody id="student-table-body"></tbody>
-    </table>
-  </div>
 
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modal-title">Student Details</h2>
-        <button onclick="closeModal()">✖</button>
-      </div>
-      <form id="student-form">
-        <div class="form-group">
-          <label for="register_number">Register Number</label>
-          <input type="text" id="register_number" required placeholder="Enter the Register Number" oninput="checkRegisterNumberLength()" />
-        </div>
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" required placeholder="Enter the Name of the Student"/>
-        </div>
-        <div class="form-group">
-          <label for="department">Department</label>
-          <div id="department" class="radio-group">
-            <label><input type="radio" name="department" value="IT" /> IT</label>
-            <label><input type="radio" name="department" value="CSE" /> CSE</label>
-            <label><input type="radio" name="department" value="ECE" /> ECE</label>
-            <label><input type="radio" name="department" value="EEE" /> EEE</label>
-            <label><input type="radio" name="department" value="EIE" /> EIE</label>
-            <label><input type="radio" name="department" value="CIVIL" /> CIVIL</label>
-            <label><input type="radio" name="department" value="MECH" /> MECH</label>
-            <label><input type="radio" name="department" value="MT" /> MT</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="cgpa">CGPA</label>
-          <input type="number" id="cgpa" step="0.1" required placeholder="Enter the CGPA"/>
-        </div>
-        <div class="form-group">
-          <label for="attendance">Attendance (%)</label>
-          <input type="number" id="attendance" required placeholder="Enter the Percentage of Attendance"/>
-        </div>
-
-        <div class="btn-group">
-          <button type="button" onclick="goToPrevious()">Previous</button>
-          <button type="button" onclick="toggleInsert()">Insert</button>
-          <button type="button" onclick="updateStudent()">Update</button>
-          <button type="button" onclick="clearModalInputs()">Clear</button>
-          <button type="button" onclick="saveChanges()">Save</button>
-          <button type="button" onclick="commitChanges()">Commit</button>
-          <button type="button" onclick="goToNext()">Next</button>
-        </div>
-      </form>
-    </div>
-  </div>
+</div>
 
   <script>
   let students = [];
@@ -351,7 +501,6 @@ function toggleInsert() {
   }
 }
 
-
     function getSelectedDepartment() {
     const departmentRadioButtons = document.getElementsByName('department');
     for (let radioButton of departmentRadioButtons) {
@@ -373,15 +522,14 @@ function fetchStudents() {
 }
 
 function checkRegisterNumberLength() {
-    const registerNumber = document.getElementById('register_number').value.trim();
+      const registerNumber = document.getElementById("register_number").value;
 
-    // Trigger fetch only when the register number is exactly 10 digits
-    if (registerNumber.length === 10) {
-        fetchStudentDetails(registerNumber);
+      if (registerNumber.length === 10) {
+        fetchStudentDetailsFromBuffer();  // Trigger the fetch when 10 digits are entered
+      }
     }
-}
 
-async function fetchStudentDetails() {
+async function fetchAndPopulateStudentDetails() {
   const registerNumber = document.getElementById("register_number").value;
 
   // Validate input
@@ -392,10 +540,13 @@ async function fetchStudentDetails() {
 
   try {
     const response = await fetch(`/getStudentDetails/${registerNumber}`);
+    
+    // Check if the response is successful
     if (response.ok) {
       const student = await response.json();
 
       if (student) {
+        // Populate student details in the form fields
         document.getElementById("name").value = student.name || "";
         document.getElementById("cgpa").value = student.cgpa || "";
         document.getElementById("attendance").value = student.attendance || "";
@@ -406,60 +557,162 @@ async function fetchStudentDetails() {
           radio.checked = radio.value === student.department;
         });
       } else {
-        //alert("No student found with this register number.");
+        alert("No student found with this register number.");
       }
     } else {
-      //console.error("Failed to fetch student details");
-      //alert("Error fetching student details.");
+      alert("Failed to fetch student details. Please try again later.");
     }
   } catch (error) {
     console.error("Error:", error);
-    //alert("An error occurred while fetching student details.");
+    alert("An error occurred while fetching student details.");
   }
 }
 
-    function openModal(student = {}) {
-    document.getElementById("modal").style.display = "flex";
-    document.getElementById("register_number").value = student.register_number || "";
-    document.getElementById("name").value = student.name || "";
-    document.getElementById("department").value = student.department || "";
-    document.getElementById("cgpa").value = student.cgpa || "";
-    document.getElementById("attendance").value = student.attendance || "";
-    editingIndex = students.findIndex(
-      (s) => s.register_number === student.register_number
-    );
+// Open the modal and pre-fill fields
+async function openUpdateModal() {
+  const registerNumber = document.getElementById("register_number").value.trim();
+
+  // Check if the register number field is empty
+  if (!registerNumber) {
+    alert("Register Number is required to update a record.");
+    return;
   }
 
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-      clearForm();
+  try {
+    // Check if the record exists in the buffer
+    const response = await fetch("/check_record_exists", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ register_number: registerNumber }),
+    });
+
+    const result = await response.json();
+
+    if (!result.exists) {
+      alert("No matching record found in the buffer to update.");
+      return;
     }
 
-    function clearForm() {
-      document.getElementById('student-form').reset();
-      editingIndex = null;
-    }
+    // If record exists, open the modal
+    const modal = document.getElementById("update-modal");
+    modal.style.display = "block";
+  } catch (error) {
+    console.error("Error checking record existence:", error);
+    alert("An error occurred while checking the record. Please try again.");
+  }
+}
 
-    function updateStudent() {
-      if (editingIndex !== null) {
-        const student = getStudentData();
-        fetch('/update_student', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(student),
-        })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.message);
-          students[editingIndex] = student;
-          renderTable();
-          closeModal();
-        })
-        .catch(error => console.error('Error updating student:', error));
+function closeUpdateModal() {
+  const modal = document.getElementById("update-modal");
+  modal.style.display = "none";
+}
+
+
+// Handle field selection in the update modal
+function updateFieldSelection() {
+  const selectedField = document.getElementById("update-field").value;
+
+  // Show relevant input field based on selected field
+  if (selectedField === "department") {
+    document.getElementById("department-dropdown").style.display = "block";
+    document.getElementById("generic-input").style.display = "none";
+  } else if (selectedField === "name" || selectedField === "cgpa" || selectedField === "attendance") {
+    document.getElementById("department-dropdown").style.display = "none";
+    document.getElementById("generic-input").style.display = "block";
+
+    // Fetch current value from the form
+    const currentValue = document.getElementById(selectedField).value;
+    document.getElementById("new-value").value = currentValue;
+  } else {
+    document.getElementById("department-dropdown").style.display = "none";
+    document.getElementById("generic-input").style.display = "none";
+  }
+}
+
+// Submit the update to the backend
+function submitUpdate() {
+  const registerNumber = document.getElementById("register_number").value;
+  const field = document.getElementById("update-field").value;
+  const newValue =
+    field === "department"
+      ? document.getElementById("department-value").value
+      : document.getElementById("new-value").value.trim();
+
+  // Validation
+  if (!field || !newValue) {
+    alert("Please select a field and provide a valid new value.");
+    return;
+  }
+
+  if (field === "cgpa") {
+    const cgpaValue = parseFloat(newValue);
+    if (isNaN(cgpaValue) || cgpaValue < 0 || cgpaValue > 10) {
+      alert("CGPA must be a number between 0 and 10.");
+      return;
+    }
+  }
+
+  if (field === "attendance") {
+    const attendanceValue = parseInt(newValue, 10);
+    if (isNaN(attendanceValue) || attendanceValue < 0 || attendanceValue > 100) {
+      alert("Attendance must be a number between 0 and 100.");
+      return;
+    }
+  }
+
+  // Send PUT request to the backend
+  fetch("/update_student", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      register_number: registerNumber,
+      field: field,
+      new_value: newValue,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message) {
+        alert(data.message);
+
+        // Update the form field with the new value
+        if (field === "name") {
+          document.getElementById("name").value = newValue;
+        } else if (field === "department") {
+          document.querySelector(
+            `input[name="department"][value="${newValue}"]`
+          ).checked = true;
+        } else if (field === "cgpa") {
+          document.getElementById("cgpa").value = newValue;
+        } else if (field === "attendance") {
+          document.getElementById("attendance").value = newValue;
+        }
+      } else {
+        alert(data.error || "An error occurred.");
       }
-    }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("Failed to update. Please try again.");
+    })
+    .finally(() => {
+      closeUpdateModal();
+    });
+}
+
+
+// Function to close the modal after update or cancellation
+function hideModal() {
+  const modal = document.querySelector(".modal");
+  if (modal) {
+    document.body.removeChild(modal);
+  }
+}
+
 
     function clearModalInputs() {
   // Leave the 'register_number' field untouched
@@ -473,6 +726,39 @@ async function fetchStudentDetails() {
   });
 }
 
+async function fetchStudentDetailsFromBuffer() {
+      const registerNumber = document.getElementById("register_number").value;
+
+      // Validate if the register number is exactly 10 digits
+      if (registerNumber.length === 10) {
+        try {
+          const response = await fetch(`/getStudentDetailsFromBuffer/${registerNumber}`);
+          if (response.ok) {
+            const student = await response.json();
+
+            if (student) {
+              // Populate form with the student details
+              document.getElementById("name").value = student.name || "";
+              document.getElementById("cgpa").value = student.cgpa || "";
+              document.getElementById("attendance").value = student.attendance || "";
+
+              // Set the correct department radio button
+              const departmentRadios = document.querySelectorAll("input[name='department']");
+              departmentRadios.forEach((radio) => {
+                radio.checked = radio.value === student.department;
+              });
+            }
+          } else {
+            // alert("No student found in the buffer with this register number.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("An error occurred while fetching student details.");
+        }
+      } else {
+        // alert("Please enter a valid 10-digit register number.");
+      }
+    }
 
 function saveChanges() {
   const student = getStudentData();  // Get data from the form
@@ -608,13 +894,30 @@ function commitChanges() {
 }
 
 function goToNext() {
-  if (editingIndex < students.length - 1) {
-    editingIndex++;  // Move to the next student
+  if (students.length === 1) {
+    // If there's only one student, fetch and display that record
+    setModalData(students[0]);
+  } else if (editingIndex < students.length - 1) {
+    // Move to the next student
+    editingIndex++;  
     setModalData(students[editingIndex]);  // Set the modal data with the next student's data
   } else {
     alert("This is the last record.");
   }
 }
+function goToNext() {
+  if (students.length === 1) {
+    // If there's only one student, fetch and display that record
+    setModalData(students[0]);
+  } else if (editingIndex < students.length - 1) {
+    // Move to the next student
+    editingIndex++;  
+    setModalData(students[editingIndex]);  // Set the modal data with the next student's data
+  } else {
+    alert("This is the last record.");
+  }
+}
+
 
 function setModalData(student) {
     // Set form field values with student data
@@ -635,24 +938,6 @@ function setModalData(student) {
 
     // Enable the modal and show it
     $('#myModal').modal('show');
-}
-
-function openModal(student = {}) {
-  document.getElementById("modal").style.display = "flex";
-  document.getElementById("register_number").value = student.register_number || "";
-  document.getElementById("name").value = student.name || "";
-  document.getElementById("cgpa").value = student.cgpa || "";
-  document.getElementById("attendance").value = student.attendance || "";
-
-  // Set the department radio button based on the student's department
-  const departmentRadios = document.getElementsByName("department");
-  departmentRadios.forEach(radio => {
-    radio.checked = radio.value === student.department; // Check the radio button corresponding to the student's department
-  });
-
-  editingIndex = students.findIndex(
-    (s) => s.register_number === student.register_number
-  );
 }
 
     function getStudentData() {
@@ -679,60 +964,103 @@ function openModal(student = {}) {
   };
 }
 
-    function deleteStudent(register_number) {
-    fetch(`/delete_student/${register_number}`, {
-      method: "DELETE",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        alert(data.message);
-        students = students.filter(
-          (student) => student.register_number !== register_number
-        ); // Remove student locally
-        renderTable(); // Update the table
-      })
-      .catch((error) => console.error("Error deleting student:", error));
-  }
+function deleteStudent() {
+  const registerNumber = document.getElementById("register_number").value;
 
-
-  function renderTable() {
-  const tbody = document.getElementById("student-table-body");
-  tbody.innerHTML = "";
-
-  students.forEach((student) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${student.register_number}</td>
-      <td>${student.name}</td>
-      <td>${student.department}</td>
-      <td>${student.cgpa}</td>
-      <td>${student.attendance}</td>
-      <td class="options">
-        <button onclick='openModal(${JSON.stringify(student)})' class="edit-icon">✎</button>
-        <button onclick="deleteStudent('${student.register_number}')" class="delete-icon">🗑</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-function openSearchModal() {
-  document.getElementById("search-modal").style.display = "flex";
-}
-
-function closeSearchModal() {
-  document.getElementById("search-modal").style.display = "none";
-  document.getElementById("search-results").innerHTML = ""; // Clear results
-}
-
-function searchStudents() {
-  const registerNumber = document.getElementById("search_register_number").value.trim();
-
+  // Validate input
   if (!registerNumber) {
-    document.getElementById("search-results").innerHTML = ""; // Clear results if input is empty
+    alert("Please enter a register number.");
     return;
   }
 
-  fetch(`/search_students?register_number=${registerNumber}`)
+  // Proceed with fetch to delete the student using the entered register number
+  fetch(`/delete_student/${registerNumber}`, {
+    method: "DELETE",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      alert(data.message);  // Show success or error message
+      if (data.message === "Student deleted successfully!") {
+        // Optionally, clear the form or remove the student from a local table if necessary
+        document.getElementById("student-form").reset();  // Reset the form after successful deletion
+      }
+    })
+    .catch((error) => {
+      console.error("Error deleting student:", error);
+      alert("An error occurred while deleting the student.");
+    });
+}
+
+
+function renderTable() {
+  const tableBody = document.querySelector("#studentsTable tbody");
+  tableBody.innerHTML = "";  // Clear the existing table rows
+  
+  students.forEach((student) => {
+    const row = document.createElement("tr");
+    row.dataset.registerNumber = student.register_number;  // Store the register number for each row
+    row.innerHTML = `
+      <td>${student.register_number}</td>
+      <td>${student.name}</td>
+      <td>${student.cgpa}</td>
+      <td>${student.attendance}</td>
+      <td><button onclick="deleteStudent('${student.register_number}')">Delete</button></td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+
+window.onload = function() {
+  fetch('/get_students')
+    .then(response => response.json())
+    .then(data => {
+      students = data; // Assuming the response contains the list of students
+      renderTable();  // Populate the table
+    })
+    .catch((error) => console.error("Error fetching students:", error));
+  fetchStudents(); // Fetch the initial data when the page loads
+
+  // Optionally, you can call fetchStudents periodically, e.g., every 1 second
+  setInterval(fetchStudents, 1000); // Fetch every 1 second to update the data
+};
+document.getElementById('searchStudentMarksBtn').addEventListener('click', function() {
+    openModal1('searchStudentMarksModal');
+  });
+
+  document.getElementById('addMarksBtn').addEventListener('click', function() {
+    openModal1('addMarksModal');
+  });
+
+// Fetch available register numbers and populate the dropdown
+function populateRegisterNumbers() {
+  fetch('/get_register_numbers')
+    .then(response => response.json())
+    .then(data => {
+      const dropdown = document.getElementById('registerDropdown');
+      dropdown.innerHTML = '<option value="" disabled selected>Choose Register Number</option>';
+      data.forEach(registerNumber => {
+        const option = document.createElement('option');
+        option.value = registerNumber;
+        option.textContent = registerNumber;
+        dropdown.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching register numbers:", error);
+      alert("Failed to load register numbers.");
+    });
+}
+
+// Fetch and display the student details for the selected register number
+document.getElementById('fetchStudentDetailsBtn').addEventListener('click', function() {
+  const registerNumber = document.getElementById('registerDropdown').value;
+  if (!registerNumber) {
+    alert("Please select a register number.");
+    return;
+  }
+
+  fetch(`/get_student_details?register_number=${encodeURIComponent(registerNumber)}`)
     .then(response => response.json())
     .then(data => {
       if (data.error) {
@@ -740,23 +1068,26 @@ function searchStudents() {
         return;
       }
 
-      const tbody = document.getElementById("search-results");
-      tbody.innerHTML = ""; // Clear existing results
-
-      data.forEach(student => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${student.register_number}</td>
-          <td>${student.name}</td>
-          <td>${student.department}</td>
-          <td>${student.cgpa}</td>
-          <td>${student.attendance}</td>
-        `;
-        tbody.appendChild(row);
-      });
+      // Populate the student details table
+      const detailsTable = document.getElementById('student-details').querySelector('tbody');
+      detailsTable.innerHTML = `
+        <tr>
+          <td>${data.register_number}</td>
+          <td>${data.name}</td>
+          <td>${data.department}</td>
+          <td>${data.cgpa}</td>
+          <td>${data.attendance}</td>
+        </tr>
+      `;
     })
-    .catch(error => console.error("Error searching students:", error));
-}
+    .catch(error => {
+      console.error("Error fetching student details:", error);
+      alert("Failed to fetch student details.");
+    });
+});
+
+// Initialize the dropdown on page load
+window.onload = populateRegisterNumbers;
 
   </script>
 </body>
