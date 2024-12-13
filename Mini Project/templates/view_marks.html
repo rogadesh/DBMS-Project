@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Student Marks - Student Performance Tracker</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Container Styling */
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 1000px;
+      text-align: center;
+    }
+
+    /* Title Styling */
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Input and Button Styling */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      width: 200px;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    thead {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+      background-color: #e9ecef;
+    }
+
+    /* Wrapper for Horizontal Scrolling */
+    .table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    button.main-page-button {
+  align-self: center; /* Horizontally center */
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 4px;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>View Student Marks</h1>
+    <!-- Input for Register Number -->
+    <div class="input-group">
+      <input type="text" id="registerNumber" placeholder="Enter Register Number" />
+      <button onclick="viewStudentMarks()">View Marks</button>
+    </div>
+
+    <!-- Wrapper for table to enable horizontal scrolling -->
+    <div class="table-wrapper">
+      <!-- Table to display student marks and details -->
+      <table id="marksTable">
+        <thead>
+          <tr>
+            <th>Register Number</th>
+            <th>Name</th>
+            <th>CN Test 1</th>
+            <th>CN Test 2</th>
+            <th>CN Test 3</th>
+            <th>OOAD Test 1</th>
+            <th>OOAD Test 2</th>
+            <th>OOAD Test 3</th>
+            <th>RMGT Test 1</th>
+            <th>RMGT Test 2</th>
+            <th>RMGT Test 3</th>
+            <th>ICT Test 1</th>
+            <th>ICT Test 2</th>
+            <th>ICT Test 3</th>
+            <th>DBMS Test 1</th>
+            <th>DBMS Test 2</th>
+            <th>DBMS Test 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Marks data will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Button to go back to the main page -->
+    <button class="main-page-button" onclick="window.location.href='/student_page'">Main Page</button>
+  </div>
+
+  <script>
+    // Function to fetch student marks and details based on register number
+    function viewStudentMarks() {
+      const registerNumber = document.getElementById('registerNumber').value;
+
+      if (!registerNumber) {
+        alert('Please enter a register number');
+        return;
+      }
+
+      // Fetch data from the Flask API
+      fetch(`http://localhost:5000/getStudentMarksAndDetails/${registerNumber}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            populateMarksTable(data);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while fetching the data.');
+        });
+    }
+
+    // Function to populate the table with student data and marks
+    function populateMarksTable(data) {
+      const tableBody = document.querySelector('#marksTable tbody');
+      tableBody.innerHTML = ''; // Clear previous table rows
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${data.register_number}</td>
+        <td>${data.name}</td>
+        <td>${data.CN_Test1}</td>
+        <td>${data.CN_Test2}</td>
+        <td>${data.CN_Test3}</td>
+        <td>${data.OOAD_Test1}</td>
+        <td>${data.OOAD_Test2}</td>
+        <td>${data.OOAD_Test3}</td>
+        <td>${data.RMGT_Test1}</td>
+        <td>${data.RMGT_Test2}</td>
+        <td>${data.RMGT_Test3}</td>
+        <td>${data.ICT_Test1}</td>
+        <td>${data.ICT_Test2}</td>
+        <td>${data.ICT_Test3}</td>
+        <td>${data.DBMS_Test1}</td>
+        <td>${data.DBMS_Test2}</td>
+        <td>${data.DBMS_Test3}</td>
+      `;
+      tableBody.appendChild(row);
+    }
+  </script>
+</body>
+</html>

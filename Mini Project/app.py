@@ -136,10 +136,10 @@ def insert_student():
         ))
 
         conn.commit()
-        return jsonify({"message": "Student inserted successfully!"}), 201
+        return jsonify({"message": "Student Record inserted successfully into the Buffer!"}), 201
 
     except pyodbc.IntegrityError:  # Handle duplicate primary key error
-        return jsonify({"error": "Register number already exists!"}), 400
+        return jsonify({"error": "Register Number already exists!"}), 400
 
     except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
@@ -222,7 +222,7 @@ def update_student():
         if cursor.rowcount == 0:
             return jsonify({"message": "No student found with the given register number."}), 404
 
-        return jsonify({"message": "Student updated successfully!"}), 200
+        return jsonify({"message": "Student Record updated successfully!"}), 200
 
     except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
@@ -255,7 +255,7 @@ def delete_student(register_number):
             return jsonify({"message": "No student found with the given register number."}), 404
 
         print("Student deleted successfully.")
-        return jsonify({"message": "Student deleted successfully!"}), 200
+        return jsonify({"message": "Student Record deleted successfully from Buffer!"}), 200
 
     except pyodbc.Error as e:
         print(f"Database error: {str(e)}")
@@ -298,7 +298,7 @@ def commit_student():
 
         # Commit the transaction to the database
         conn.commit()
-        return jsonify({"message": "Student record inserted successfully into students table!"}), 201
+        return jsonify({"message": "Student Record inserted successfully into the Database!"}), 201
 
     except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
@@ -350,6 +350,14 @@ def student_page():
 @app.route("/search_student")
 def search_student():
     return render_template('search_student.html')
+
+@app.route("/add_marks")
+def add_marks():
+    return render_template('add_marks.html')
+
+@app.route("/view_marks")
+def view_marks():
+    return render_template('view_marks.html')
 
 @app.route("/get_students_records", methods=["GET"])
 def get_students_records():
@@ -698,92 +706,172 @@ def reset_user_password():
         cursor.close()
         conn.close()
 
-@app.route('/search_marks', methods=['GET'])
-def search_marks():
-    register_number = request.args.get('register_number')
-
-    # Connect to database
-    conn = pyodbc.connect(connection_string)
-    cursor = conn.cursor()
-
-    # Query to fetch marks only for IT students
-    cursor.execute("""
-        SELECT * FROM marks
-        WHERE register_number = ? AND department = 'IT'
-    """, (register_number,))
-
-    marks = cursor.fetchone()
-
-    if marks:
-        return jsonify({
-            'success': True,
-            'marks': marks
-        })
-    else:
-        return jsonify({'success': False, 'message': 'Marks not found or student not in IT department'}), 404
-
-@app.route('/add_marks', methods=['POST'])
-def add_marks():
-    data = request.get_json()
-    register_number = data.get("registerNumber")
-    semester = data.get("semester")
-    subjects = data.get("subjects")
-
-    # Validate input data
-    if not register_number or not semester or not subjects:
-        return jsonify({"success": False, "message": "Invalid input data"}), 400
-
-    conn = pyodbc.connect(connection_string)
-    cursor = conn.cursor()
-
+@app.route("/validate_register_number/<register_number>", methods=["GET"])
+def validate_register_number(register_number):
     try:
-        for subject_data in subjects:
-            subject = subject_data.get("subject")
-            test1 = subject_data.get("test1", 0)
-            test2 = subject_data.get("test2", 0)
-            test3 = subject_data.get("test3", 0)
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-            if not subject:
-                continue  # Skip if subject is empty
+        query = "SELECT department FROM students WHERE register_number = ?"
+        cursor.execute(query, (register_number,))
+        result = cursor.fetchone()
 
-            # Debugging: Log the query and parameters
-            print(f"Inserting/Updating Marks for {register_number}, Semester {semester}, Subject: {subject}")
+        if not result:
+            return jsonify({"valid": False, "error": "Register number does not exist."}), 404
 
-            # Insert or update marks
-            query = """
-                MERGE INTO marks m
-                USING DUAL
-                ON (m.register_number = ? AND m.semester = ? AND m.subject = ?)
-                WHEN MATCHED THEN
-                    UPDATE SET test1 = ?, test2 = ?, test3 = ?
-                WHEN NOT MATCHED THEN
-                    INSERT (register_number, semester, subject, test1, test2, test3)
-                    VALUES (?, ?, ?, ?, ?, ?)
-            """
-            parameters = (
-                register_number, semester, subject,
-                test1, test2, test3,
-                register_number, semester, subject,
-                test1, test2, test3
-            )
+        department = result[0]
+        if department != "IT":
+            return jsonify({"valid": False, "error": "Student is not from the IT department."}), 400
 
-            cursor.execute(query, parameters)
-
-        conn.commit()
-        return jsonify({"success": True, "message": "Marks saved successfully!"})
+        return jsonify({"valid": True, "department": department}), 200
 
     except pyodbc.Error as e:
-        print(f"Database error: {e}")
-        conn.rollback()
-        return jsonify({"success": False, "message": f"Database error: {e}"}), 500
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        conn.rollback()
-        return jsonify({"success": False, "message": f"Unexpected error: {e}"}), 500
+        return jsonify({"valid": False, "error": f"Database error: {str(e)}"}), 500
+
     finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/check_marks_submission/<register_number>", methods=["GET"])
+def check_marks_submission(register_number):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Query to check if marks have already been submitted for the student
+        query = "SELECT COUNT(*) FROM marks WHERE register_number = ?"
+        cursor.execute(query, (register_number,))
+        result = cursor.fetchone()
+
+        if result and result[0] > 0:
+            return jsonify({"submitted": True}), 200
+        else:
+            return jsonify({"submitted": False}), 200
+
+    except pyodbc.Error as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+    finally:
+        cursor.close()
         conn.close()
 
 
+@app.route("/add_subject_marks", methods=["POST"])
+def add_subject_marks():
+    try:
+        data = request.get_json()
+        reg_number = data.get("register_number")
+        subjects = data.get("subjects")
+
+        if not reg_number or not subjects:
+            return jsonify({"error": "Invalid data provided."}), 400
+
+        # Prepare data for insertion
+        marks_data = (
+            reg_number,
+            subjects["Computer Networks"][0], subjects["Computer Networks"][1], subjects["Computer Networks"][2],
+            subjects["Object Oriented Analysis and Design"][0], subjects["Object Oriented Analysis and Design"][1], subjects["Object Oriented Analysis and Design"][2],
+            subjects["Resource Management and Graph Theory"][0], subjects["Resource Management and Graph Theory"][1], subjects["Resource Management and Graph Theory"][2],
+            subjects["Information Coding Techniques"][0], subjects["Information Coding Techniques"][1], subjects["Information Coding Techniques"][2],
+            subjects["Database Management Systems"][0], subjects["Database Management Systems"][1], subjects["Database Management Systems"][2],
+        )
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Insert marks into the table
+        query = """
+            INSERT INTO marks (
+                register_number,
+                CN_Test1, CN_Test2, CN_Test3,
+                OOAD_Test1, OOAD_Test2, OOAD_Test3,
+                RMGT_Test1, RMGT_Test2, RMGT_Test3,
+                ICT_Test1, ICT_Test2, ICT_Test3,
+                DBMS_Test1, DBMS_Test2, DBMS_Test3
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        cursor.execute(query, marks_data)
+        conn.commit()
+
+        return jsonify({"message": "Marks successfully submitted!"}), 200
+
+    except pyodbc.Error as e:
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/getStudentMarksAndDetails/<register_number>', methods=['GET'])
+def get_student_marks_and_details(register_number):
+    try:
+        # Establish a connection to the database
+        conn = get_db_connection()  # Replace with your actual database connection logic
+        cursor = conn.cursor()
+
+        # Query to fetch student details (name) from the students table
+        student_query = """
+        SELECT name 
+        FROM students 
+        WHERE register_number = ?
+        """
+        cursor.execute(student_query, (register_number,))
+        student_record = cursor.fetchone()
+
+        if not student_record:
+            return jsonify({"error": "Student not found"}), 404
+
+        student_name = student_record[0]
+
+        # Query to fetch student marks from the marks table
+        marks_query = """
+        SELECT CN_Test1, CN_Test2, CN_Test3, 
+               OOAD_Test1, OOAD_Test2, OOAD_Test3, 
+               RMGT_Test1, RMGT_Test2, RMGT_Test3,
+               ICT_Test1, ICT_Test2, ICT_Test3,
+               DBMS_Test1, DBMS_Test2, DBMS_Test3
+        FROM marks
+        WHERE register_number = ?
+        """
+        cursor.execute(marks_query, (register_number,))
+        marks_record = cursor.fetchone()
+
+        if not marks_record:
+            return jsonify({"error": "Marks not found for the student"}), 404
+
+        # Prepare the student data along with the marks
+        student_data = {
+            "register_number": register_number,
+            "name": student_name,
+            "CN_Test1": marks_record[0],
+            "CN_Test2": marks_record[1],
+            "CN_Test3": marks_record[2],
+            "OOAD_Test1": marks_record[3],
+            "OOAD_Test2": marks_record[4],
+            "OOAD_Test3": marks_record[5],
+            "RMGT_Test1": marks_record[6],
+            "RMGT_Test2": marks_record[7],
+            "RMGT_Test3": marks_record[8],
+            "ICT_Test1": marks_record[9],
+            "ICT_Test2": marks_record[10],
+            "ICT_Test3": marks_record[11],
+            "DBMS_Test1": marks_record[12],
+            "DBMS_Test2": marks_record[13],
+            "DBMS_Test3": marks_record[14]
+        }
+
+        # Return the student details and marks as JSON
+        return jsonify(student_data)
+
+    except pyodbc.Error as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
 
 
 if __name__ == "__main__":

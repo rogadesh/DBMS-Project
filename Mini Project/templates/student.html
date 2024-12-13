@@ -162,7 +162,7 @@
       border-radius: 4px;
     }
     .btn-group1 {
-    margin-left: 160px;
+    margin-left: 40px;
     margin-top: 15px; /* Space between the button group and the fields above */
     display: flex; /* Arrange buttons horizontally */
     gap: 15px; /* Space between buttons */
@@ -376,7 +376,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Student Performance Tracker</h1>
+    <h1>Student's Academic Performance Tracker</h1>
 
     <!-- Student Entry Form -->
     <form id="student-form">
@@ -424,7 +424,9 @@
     </div>
     <div class="btn-group1"> 
       <button onclick="window.location.href='/buffer_records'">Buffer Records</button>
+      <button onclick="window.location.href='/add_marks'">Add Marks</button>
       <button onclick="window.location.href='/search_student'">Search Student</button>
+      <button onclick="window.location.href='/view_marks'">View Marks</button>
       <button onclick="window.location.href='/database_records'">Database Records</button>
     </div>
 
@@ -980,7 +982,7 @@ function deleteStudent() {
     .then((response) => response.json())
     .then((data) => {
       alert(data.message);  // Show success or error message
-      if (data.message === "Student deleted successfully!") {
+      if (data.message === "Student Record deleted successfully from Buffer!") {
         // Optionally, clear the form or remove the student from a local table if necessary
         document.getElementById("student-form").reset();  // Reset the form after successful deletion
       }

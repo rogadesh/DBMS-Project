@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Marks - Student Performance Tracker</title>
+  <style>
+    /* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Container Styling */
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 1000px;
+  text-align: center;
+  overflow: auto;
+}
+
+/* Title Styling */
+h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Form Container Styling */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center input and label */
+  justify-content: center;
+}
+
+/* Label Styling */
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Input Field Styling */
+input[type="number"],
+input[type="text"] {
+  width: 170px; /* Adjust the width for 2-digit numbers */
+  padding: 8px; /* Adjust padding */
+  font-size: 1rem; /* Font size for readability */
+  text-align: center; /* Center text in the input */
+  margin: 5px 0 5px 0; /* Margin between inputs */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Focus Styling */
+input[type="number"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #007BFF; /* Change border on focus */
+}
+
+/* Button Styling */
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: white;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Flexbox Layout for Subjects */
+.subjects-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  text-align: left;
+}
+
+.subject-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Responsiveness for Smaller Screens */
+@media (max-width: 768px) {
+  .container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+  margin-bottom: 10px; /* Adjust this value to control the space */
+  padding-bottom: 15px;
+  font-size: 1.2rem; /* Optional: change font size for better readability */
+}
+
+  input[type="number"] {
+    width: 50px; /* Adjust input width for smaller screens */
+    padding: 5px;
+    font-size: 0.9rem;
+  }
+
+  .subjects-container {
+    flex-direction: column; /* Stack the subjects vertically */
+  }
+}
+
+#register_number {
+  width: 250px; /* Adjust the width for better fit */
+  padding: 10px; /* Adjust padding for better spacing */
+  font-size: 1rem; /* Font size for readability */
+  text-align: center; /* Center text in the input */
+  margin: 10px auto; /* Center the input horizontally with auto margins */
+  display: block; /* Make input a block element so margins work */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.register-container {
+  display: flex; /* Align input and button horizontally */
+  align-items: center; /* Vertically align items */
+  margin-right: 130px;
+  gap: 10px; /* Add spacing between the input and button */
+}
+
+#continue-btn {
+  position: fixed;
+  right: 500px;
+  top: 104px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add Marks - IT Department</h1>
+    
+    <!-- Add Marks Form -->
+    <div class="form-group">
+        <!-- <label for="register_number">Register Number</label> -->
+        <div class="register-container">
+          <input 
+            type="text" 
+            id="register_number" 
+            required 
+            placeholder="Enter the Register Number" 
+          />
+          <button 
+            type="button" 
+            id="continue-btn" 
+            onclick="validateRegisterNumber()">
+            Continue
+          </button>
+        </div>
+      </div>
+      
+
+      <!-- Subjects and Marks Inputs -->
+      <!-- <h3>Enter Marks for 3 Tests</h3> -->
+<div class="subjects-container">
+  <!-- Subject Groups (Locked by default) -->
+  <div class="subject-group">
+    <label for="subject1">Computer Networks</label>
+    <input type="number" id="subject1_test1" placeholder="Test 1 Marks" disabled required />
+    <input type="number" id="subject1_test2" placeholder="Test 2 Marks" disabled required />
+    <input type="number" id="subject1_test3" placeholder="Test 3 Marks" disabled required />
+  </div>
+
+  <div class="subject-group">
+    <label for="subject2">Object Oriented Analysis and Design</label>
+    <input type="number" id="subject2_test1" placeholder="Test 1 Marks" disabled required />
+    <input type="number" id="subject2_test2" placeholder="Test 2 Marks" disabled required />
+    <input type="number" id="subject2_test3" placeholder="Test 3 Marks" disabled required />
+  </div>
+
+  <div class="subject-group">
+    <label for="subject3">Resource Management and Graph Theory</label>
+    <input type="number" id="subject3_test1" placeholder="Test 1 Marks" disabled required />
+    <input type="number" id="subject3_test2" placeholder="Test 2 Marks" disabled required />
+    <input type="number" id="subject3_test3" placeholder="Test 3 Marks" disabled required />
+  </div>
+
+  <div class="subject-group">
+    <label for="subject4">Information Coding Techniques</label>
+    <input type="number" id="subject4_test1" placeholder="Test 1 Marks" disabled required />
+    <input type="number" id="subject4_test2" placeholder="Test 2 Marks" disabled required />
+    <input type="number" id="subject4_test3" placeholder="Test 3 Marks" disabled required />
+  </div>
+
+  <div class="subject-group">
+    <label for="subject5">Database Management Systems</label>
+    <input type="number" id="subject5_test1" placeholder="Test 1 Marks" disabled required />
+    <input type="number" id="subject5_test2" placeholder="Test 2 Marks" disabled required />
+    <input type="number" id="subject5_test3" placeholder="Test 3 Marks" disabled required />
+  </div>
+</div>
+
+    <button type="button" id="submit-btn" onclick="submitMarks()" disabled>Submit Marks</button>
+      <button onclick="window.location.href='/student_page'">Main Page</button>
+    </form>
+  </div>
+
+  <script>
+async function validateRegisterNumber() {
+  const regNumber = document.getElementById("register_number").value.trim();
+
+  if (!regNumber) {
+    alert("Please enter the Register Number.");
+    lockFields();
+    return;
+  }
+
+  try {
+    // Validate the register number (IT department check)
+    const response = await fetch(`/validate_register_number/${regNumber}`);
+    const result = await response.json();
+
+    if (response.ok && result.valid) {
+      // Check if marks have already been submitted
+      const checkMarksResponse = await fetch(`/check_marks_submission/${regNumber}`);
+      const checkMarksResult = await checkMarksResponse.json();
+
+      if (checkMarksResult.submitted) {
+        alert("You have already submitted your marks.");
+        lockFields();  // Lock the input fields if marks are already submitted
+      } else {
+        alert("You can now enter your marks.");
+        unlockFields();  // Unlock the input fields if marks are not yet submitted
+        document.getElementById("submit-btn").disabled = false;
+      }
+    } else {
+      alert(result.error || "You do not belong to the IT department.");
+      lockFields();
+    }
+  } catch (error) {
+    console.error("Error validating register number:", error);
+    alert("Failed to validate register number.");
+    lockFields();
+  }
+}
+
+// Function to unlock subject input fields
+function unlockFields() {
+  document.querySelectorAll("input[type='number']").forEach((input) => {
+    input.disabled = false;
+  });
+}
+
+// Function to lock subject input fields
+function lockFields() {
+  document.querySelectorAll("input[type='number']").forEach((input) => {
+    input.disabled = true;
+  });
+  document.getElementById("submit-btn").disabled = true;
+}
+
+
+    // Function to submit marks
+    async function submitMarks() {
+  const regNumber = document.getElementById("register_number").value.trim();
+  const subjects = {
+    "Computer Networks": [
+      document.getElementById("subject1_test1").value.trim(),
+      document.getElementById("subject1_test2").value.trim(),
+      document.getElementById("subject1_test3").value.trim(),
+    ],
+    "Object Oriented Analysis and Design": [
+      document.getElementById("subject2_test1").value.trim(),
+      document.getElementById("subject2_test2").value.trim(),
+      document.getElementById("subject2_test3").value.trim(),
+    ],
+    "Resource Management and Graph Theory": [
+      document.getElementById("subject3_test1").value.trim(),
+      document.getElementById("subject3_test2").value.trim(),
+      document.getElementById("subject3_test3").value.trim(),
+    ],
+    "Information Coding Techniques": [
+      document.getElementById("subject4_test1").value.trim(),
+      document.getElementById("subject4_test2").value.trim(),
+      document.getElementById("subject4_test3").value.trim(),
+    ],
+    "Database Management Systems": [
+      document.getElementById("subject5_test1").value.trim(),
+      document.getElementById("subject5_test2").value.trim(),
+      document.getElementById("subject5_test3").value.trim(),
+    ],
+  };
+
+  // Validate marks
+  for (const subject in subjects) {
+    const tests = subjects[subject];
+    for (let i = 0; i < 3; i++) {
+      if (!tests[i]) {
+        alert("All Subject Marks are Required.");
+        return;
+      }
+      const mark = Number(tests[i]);
+      if (isNaN(mark) || mark < 0 || mark > 25 || !Number.isInteger(mark)) {
+        alert(`Marks for ${subject}, Test ${i + 1} must be an integer between 0 and 25.`);
+        return;
+      }
+    }
+  }
+
+  try {
+    const response = await fetch("/add_subject_marks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ register_number: regNumber, subjects }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert(result.message);
+      window.location.reload();
+    } else {
+      alert(result.error || "Failed to add marks. Please try again.");
+    }
+  } catch (error) {
+    console.error("Error submitting marks:", error);
+    alert("An error occurred while submitting marks.");
+  }
+}
+
+
+  </script>
+</body>
+</html>
