@@ -107,6 +107,7 @@
 <body>
   <div class="container">
     <h1>Login</h1>
+
     <form method="POST" action="{{ url_for('login') }}">
       <div class="form-group">
         <label for="username">Username</label>
@@ -117,6 +118,14 @@
         <input type="password" id="password" name="password" placeholder="Enter your password" required>
         <span class="toggle-password" onclick="togglePassword()">👁</span>
       </div>
+
+      <!-- Display error message below the password field -->
+      {% if error %}
+        <div class="error">
+          {{ error }}
+        </div>
+      {% endif %}
+
       <button type="submit">Login</button>
     </form>
 
@@ -130,7 +139,7 @@
       const toggleIcon = document.querySelector('.toggle-password');
       if (passwordField.type === 'password') {
         passwordField.type = 'text';
-        toggleIcon.textContent = '👁️‍🗨️'; // Eye slash icon
+        toggleIcon.textContent = '👁️‍🗨️'; // Eye-slash icon
       } else {
         passwordField.type = 'password';
         toggleIcon.textContent = '👁'; // Eye icon

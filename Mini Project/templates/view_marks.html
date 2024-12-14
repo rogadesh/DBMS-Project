@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>View Student Marks - Student Performance Tracker</title>
+  <title>Student Marks Viewer</title>
   <style>
     /* General Reset */
     * {
@@ -29,29 +29,30 @@
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 80%;
-      max-width: 1000px;
+      height: 65%;
+      max-width: 1200px;
       text-align: center;
+      position: relative;
     }
 
     /* Title Styling */
     h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
       color: #333;
-    }
-
-    /* Input and Button Styling */
-    .input-group {
       margin-bottom: 20px;
     }
 
-    input[type="text"] {
+    /* Dropdown and Button Styling */
+    .controls {
+      margin-bottom: 20px;
+    }
+
+    select {
       padding: 10px;
       font-size: 1rem;
-      width: 200px;
-      margin-right: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      margin-right: 10px;
     }
 
     button {
@@ -70,10 +71,15 @@
     }
 
     /* Table Styling */
+    .table-container {
+      margin-top: 20px;
+      overflow-x: auto; /* Enables horizontal scrolling */
+      width: 100%;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
     }
 
     thead {
@@ -99,41 +105,30 @@
       background-color: #e9ecef;
     }
 
-    /* Wrapper for Horizontal Scrolling */
-    .table-wrapper {
-      overflow-x: auto;
-      width: 100%;
-      margin-top: 20px;
+    /* Main Page Button */
+    .main-page-button {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
     }
-
-    button.main-page-button {
-  align-self: center; /* Horizontally center */
-  padding: 10px 20px;
-  font-size: 1rem;
-  color: white;
-  background-color: #007BFF;
-  border: none;
-  border-radius: 4px;
-  margin-top: 25px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
   </style>
 </head>
 <body>
   <div class="container">
     <h1>View Student Marks</h1>
-    <!-- Input for Register Number -->
-    <div class="input-group">
-      <input type="text" id="registerNumber" placeholder="Enter Register Number" />
-      <button onclick="viewStudentMarks()">View Marks</button>
+    <div class="controls">
+      <!-- Dropdown Menu -->
+      <select id="registerNumberDropdown">
+        <option value="" disabled selected>Select Register Number</option>
+      </select>
+      <!-- View Marks Button -->
+      <button onclick="fetchStudentMarks()">View Marks</button>
     </div>
 
-    <!-- Wrapper for table to enable horizontal scrolling -->
-    <div class="table-wrapper">
-      <!-- Table to display student marks and details -->
-      <table id="marksTable">
+    <!-- Table Container with Horizontal Scroll -->
+    <div class="table-container">
+      <table id="marksTable" border="1">
         <thead>
           <tr>
             <th>Register Number</th>
@@ -156,27 +151,47 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Marks data will be populated here -->
+          <!-- Dynamic content will be populated here -->
         </tbody>
       </table>
     </div>
 
-    <!-- Button to go back to the main page -->
+    <!-- Main Page Button -->
     <button class="main-page-button" onclick="window.location.href='/student_page'">Main Page</button>
   </div>
 
   <script>
-    // Function to fetch student marks and details based on register number
-    function viewStudentMarks() {
-      const registerNumber = document.getElementById('registerNumber').value;
+    document.addEventListener('DOMContentLoaded', function () {
+      populateRegisterNumbers(); // Populate dropdown when page loads
+    });
+
+    // Function to populate the dropdown with register numbers
+    function populateRegisterNumbers() {
+      fetch('http://localhost:5000/fetch_register_numbers') // Endpoint to fetch register numbers
+        .then(response => response.json())
+        .then(data => {
+          const dropdown = document.getElementById('registerNumberDropdown');
+          data.forEach(registerNumber => {
+            const option = document.createElement('option');
+            option.value = registerNumber;
+            option.textContent = registerNumber;
+            dropdown.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error fetching register numbers:', error));
+    }
+
+    // Function to fetch and display student marks
+    function fetchStudentMarks() {
+      const dropdown = document.getElementById('registerNumberDropdown');
+      const registerNumber = dropdown.value;
 
       if (!registerNumber) {
-        alert('Please enter a register number');
+        alert('Please select a register number.');
         return;
       }
 
-      // Fetch data from the Flask API
-      fetch(`http://localhost:5000/getStudentMarksAndDetails/${registerNumber}`)
+      fetch(`http://localhost:5000/getStudentMarksAndDetails/${registerNumber}`) // Endpoint to fetch student marks
         .then(response => response.json())
         .then(data => {
           if (data.error) {
@@ -185,16 +200,13 @@
             populateMarksTable(data);
           }
         })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while fetching the data.');
-        });
+        .catch(error => console.error('Error fetching student marks:', error));
     }
 
-    // Function to populate the table with student data and marks
+    // Function to populate the marks table
     function populateMarksTable(data) {
       const tableBody = document.querySelector('#marksTable tbody');
-      tableBody.innerHTML = ''; // Clear previous table rows
+      tableBody.innerHTML = ''; // Clear existing rows
 
       const row = document.createElement('tr');
       row.innerHTML = `

@@ -88,6 +88,52 @@ def signup():
 
     return render_template('signup.html')
 
+# Route to check if email already exists
+@app.route('/check-email', methods=['POST'])
+def check_email():
+    data = request.get_json()
+    email = data.get('email')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the email exists in the database
+        cursor.execute("SELECT COUNT(*) FROM user_credentials WHERE email = ?", (email,))
+        exists = cursor.fetchone()[0] > 0
+
+        return jsonify({'exists': exists})
+
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+# Route to check if username already exists
+@app.route('/check-username', methods=['POST'])
+def check_username():
+    data = request.get_json()
+    username = data.get('username')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if the username exists in the database
+        cursor.execute("SELECT COUNT(*) FROM user_credentials WHERE username = ?", (username,))
+        exists = cursor.fetchone()[0] > 0
+
+        return jsonify({'exists': exists})
+
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
 # Login route to authenticate the user
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -222,7 +268,7 @@ def update_student():
         if cursor.rowcount == 0:
             return jsonify({"message": "No student found with the given register number."}), 404
 
-        return jsonify({"message": "Student Record updated successfully!"}), 200
+        return jsonify({"message": "Student Record updated successfully in Buffer!"}), 200
 
     except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
@@ -284,7 +330,7 @@ def commit_student():
         check_query = "SELECT COUNT(*) FROM students WHERE register_number = ?"
         cursor.execute(check_query, data["register_number"])
         if cursor.fetchone()[0] > 0:
-            return jsonify({"error": "Register number already exists in the students table!"}), 400
+            return jsonify({"error": "Register number already exists in the Database!"}), 400
 
         # SQL query to insert data into the 'students' table
         insert_query = """
@@ -865,6 +911,31 @@ def get_student_marks_and_details(register_number):
 
         # Return the student details and marks as JSON
         return jsonify(student_data)
+
+    except pyodbc.Error as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/fetch_register_numbers', methods=['GET'])  # Updated route
+def fetch_register_numbers():  # Renamed function
+    try:
+        # Establish a connection to the database
+        conn = get_db_connection()  # Replace with your database connection logic
+        cursor = conn.cursor()
+
+        # Query to fetch register numbers from the marks table
+        query = "SELECT register_number FROM marks"
+        cursor.execute(query)
+
+        # Fetch all register numbers
+        records = cursor.fetchall()
+        register_numbers = [record[0] for record in records]
+
+        # Return the register numbers as JSON
+        return jsonify(register_numbers)
 
     except pyodbc.Error as e:
         return jsonify({"error": str(e)}), 500
